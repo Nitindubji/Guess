@@ -77,3 +77,18 @@ h6 {
     50%{opacity: .5;}
     100%{opacity: 1;}   
 }
+#keyboardContainer button {
+    margin: 4px;
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+#keyboardContainer {
+    max-width: 400px;
+    margin: auto;
+}
