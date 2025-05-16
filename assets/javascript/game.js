@@ -23,8 +23,8 @@ function startGame() {
   displayWord = Array.from(currentWord).map(char => (char === " " ? " " : "_"));
   updateDisplay();
   generateKeyboard();
-  welcomeMsg.textContent = "Press Any Key or Click Letters To Start!";
-  welcomeMsg.classList.add("blink");
+  welcomeMsg.textContent = ""; // No “Press Any Key” message
+  welcomeMsg.classList.remove("blink");
 }
 
 function updateDisplay() {
@@ -86,7 +86,7 @@ function showMessage(msg) {
 document.addEventListener("DOMContentLoaded", () => {
   startGame();
 
-  // Optional: Add keypress support for physical keyboard
+  // Keyboard support
   document.addEventListener("keydown", (e) => {
     const letter = e.key.toUpperCase();
     if (/^[A-Z]$/.test(letter)) {
