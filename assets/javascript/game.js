@@ -19,9 +19,9 @@ const wordDisplay = document.getElementById("currentWord");
 const guessedDisplay = document.getElementById("guessedLetters");
 const guessesLeftDisplay = document.getElementById("remainingGuesses");
 const scoreDisplay = document.getElementById("totalWins");
+const levelDisplay = document.getElementById("level");
 const welcomeMsg = document.getElementById("welcome");
 const keyboardContainer = document.getElementById("keyboardContainer");
-const levelDisplay = document.getElementById("level");
 
 function getWordsForLevel(level) {
   const wordLength = 4 + level;
@@ -31,16 +31,13 @@ function getWordsForLevel(level) {
 function pickNewWord() {
   const levelWords = getWordsForLevel(level);
   if (levelWords.length === 0) return null;
-  return levelWords[Math.floor(Math.random() * levelWords.length)].toUpperCase();
+  return levelWords[Math.floor(Math.random() * levelWords.length)];
 }
 
 function startGame() {
   guessedLetters = [];
   displayWord = [];
   guessesLeft = 6;
-  welcomeMsg.classList.add("noBlink");
-  welcomeMsg.classList.remove("blink");
-  welcomeMsg.innerText = `Level ${level}`;
 
   currentWord = pickNewWord();
   if (!currentWord) {
@@ -55,6 +52,10 @@ function startGame() {
 
   updateDisplay();
   generateKeyboard();
+
+  welcomeMsg.classList.remove("blink");
+  welcomeMsg.classList.add("noBlink");
+  welcomeMsg.textContent = `Level ${level}`;
 }
 
 function updateDisplay() {
@@ -66,30 +67,31 @@ function updateDisplay() {
 }
 
 function handleGuess(letter) {
-  if (guessedLetters.includes(letter) || displayWord.includes(letter.toUpperCase())) return;
+  if (guessedLetters.includes(letter) || displayWord.includes(letter)) return;
 
-  const keyBtn = document.querySelector(`.key-button[data-key="${letter}"]`);
+  const keyBtn = document.querySelector(`button[data-key="${letter}"]`);
   let found = false;
 
   for (let i = 0; i < currentWord.length; i++) {
-    if (currentWord[i] === letter.toUpperCase()) {
-      displayWord[i] = letter.toUpperCase();
+    if (currentWord[i].toLowerCase() === letter) {
+      displayWord[i] = currentWord[i];
       found = true;
     }
   }
 
   if (found) {
-    if (keyBtn) keyBtn.textContent = "∞";
+    if (keyBtn) keyBtn.innerText = "∞";
     if (!displayWord.includes("_")) {
       score++;
       level++;
       updateDisplay();
-      setTimeout(() => startGame(), 2000);
+      setTimeout(() => startGame(), 1500);
     }
   } else {
     guessedLetters.push(letter);
     guessesLeft--;
-    if (keyBtn) keyBtn.textContent = "✖";
+    if (keyBtn) keyBtn.innerText = "✖";
+
     if (guessesLeft === 0) {
       showBanner("GAME OVER");
       setTimeout(() => location.reload(), 3000);
@@ -113,7 +115,7 @@ function generateKeyboard() {
 }
 
 function showBanner(message) {
-  welcomeMsg.innerText = message;
+  welcomeMsg.textContent = message;
   welcomeMsg.classList.remove("noBlink");
   welcomeMsg.classList.add("blink");
   keyboardContainer.innerHTML = "";
