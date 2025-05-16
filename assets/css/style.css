@@ -16,10 +16,10 @@ body {
     color: #f7db9a;
     letter-spacing: 0.5px;
     text-shadow:
-        -1px -1px 0 #120d01,
-        1px -1px 0 #120d01,
-        -1px 1px 0 #120d01,
-        1px 1px 0 #120d01;
+      -1px -1px 0 #120d01,
+       1px -1px 0 #120d01,
+      -1px  1px 0 #120d01,
+       1px  1px 0 #120d01;
 }
 
 .jumbotron {
@@ -70,16 +70,10 @@ h6 {
     visibility: hidden;
 }
 
-@keyframes blink{
-    0%{opacity: 0;}
-    50%{opacity: .5;}
-    100%{opacity: 1;}   
-}
-
-#keyboardContainer {
-    max-width: 400px;
-    margin: 20px auto;
-    text-align: center;
+@keyframes blink {
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }
 
 #keyboardContainer button {
@@ -91,18 +85,9 @@ h6 {
     border: 1px solid #ccc;
     background-color: #f8f9fa;
     cursor: pointer;
-    user-select: none;
-    transition: background-color 0.3s, color 0.3s;
 }
 
-.key-button.correct {
-    background-color: #c8e6c9; /* light green */
-    color: #2e7d32; /* dark green */
-    font-weight: bold;
-}
-
-.key-button.wrong {
-    background-color: #ffcdd2; /* light red */
-    color: #c62828; /* dark red */
-    font-weight: bold;
+#keyboardContainer {
+    max-width: 400px;
+    margin: auto;
 }
