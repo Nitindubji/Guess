@@ -1,124 +1,131 @@
-// Your script.js file with full game logic, keyboard, scoring, banners, and difficulty level
-
-let wordList = [
-  "apple", "zebra", "lucky", "hello", "chair", "piano",
-  "planet", "mystery", "journey", "holiday",
-  "fantastic", "mountains", "adventure", "difficult",
-  "imagination", "architecture", "congratulation", "hindunberger"
+const allWords = [
+  "ZION", "YORK", "ARCH", "CAVE", "MESA",
+  "ROCKY", "ACADIA", "GRAND", "YOSEMITE", "OLYMPIC",
+  "GLACIER", "EVERGLADES", "BADLANDS", "BRYCE", "SEQUOIA",
+  "DENALI", "SAGUARO", "REDWOOD", "PINNACLES", "HALEAKALA",
+  "CHANNEL", "VOYAGEURS", "YELLOWSTONE", "GUADALUPE", "ISLE ROYALE",
+  "WRANGELL", "AMERICAN SAMOA", "GREAT BASIN", "PETRIFIED FOREST"
 ];
 
-let wordToMatch = "";
-let guessingWord = [];
+let currentWord = "";
 let guessedLetters = [];
-let remainingGuesses = 6;
+let displayWord = [];
+let guessesLeft = 6;
 let score = 0;
 let level = 1;
-let maxLevel = 20;
-let pause = false;
+let gameStarted = false;
+let usedWords = [];
 
-const winSound = new Audio("assets/audio/smb3_powerup.wav");
-const loseSound = new Audio("assets/audio/smb3_mariodie.wav");
+const wordDisplay = document.getElementById("currentWord");
+const guessedDisplay = document.getElementById("guessedLetters");
+const guessesLeftDisplay = document.getElementById("remainingGuesses");
+const scoreDisplay = document.getElementById("totalWins");
+const welcomeMsg = document.getElementById("welcome");
+const keyboardContainer = document.getElementById("keyboardContainer");
 
-function chooseWord() {
-  const levelLength = Math.min(4 + level, 12); // start from 5-letter words
-  const filteredWords = wordList.filter(word => word.length === levelLength);
-  wordToMatch = filteredWords[Math.floor(Math.random() * filteredWords.length)];
-  guessingWord = Array(wordToMatch.length).fill("_");
-  guessedLetters = [];
-  remainingGuesses = 6;
-  updateDisplay();
-  resetKeyboard();
-  pause = false;
+function getWordsForLevel(level) {
+  const wordLength = 4 + level;
+  return allWords.filter(word => word.replace(/ /g, "").length === wordLength && !usedWords.includes(word));
 }
 
-function updateDisplay() {
-  document.getElementById("wordSpotlight").innerText = guessingWord.join(" ");
-  document.getElementById("guessesRemaining").innerText = `Guesses Remaining: ${remainingGuesses}`;
-  document.getElementById("guessedLetters").innerText = `Guessed Letters: ${guessedLetters.join(", ")}`;
-  document.getElementById("score").innerText = `Score: ${score}`;
-  document.getElementById("level").innerText = `Level: ${level}`;
-}
-
-function showBanner(type) {
-  const winBanner = document.getElementById("winBanner");
-  const loseBanner = document.getElementById("loseBanner");
-
-  if (type === "win") {
-    winBanner.style.display = "block";
-    setTimeout(() => { winBanner.style.display = "none"; }, 2500);
-  } else if (type === "lose") {
-    loseBanner.style.display = "block";
-    setTimeout(() => { loseBanner.style.display = "none"; }, 2500);
-  }
-}
-
-function handleGuess(letter) {
-  if (pause || guessedLetters.includes(letter)) return;
-  guessedLetters.push(letter);
-  document.getElementById(letter).disabled = true;
-
-  if (wordToMatch.includes(letter)) {
-    for (let i = 0; i < wordToMatch.length; i++) {
-      if (wordToMatch[i] === letter) {
-        guessingWord[i] = letter;
-      }
-    }
-    document.getElementById(letter).innerText = "8"; // Correct guess mark
-  } else {
-    remainingGuesses--;
-    document.getElementById(letter).innerText = "X"; // Wrong guess mark
-  }
-
-  updateDisplay();
-
-  if (guessingWord.join("") === wordToMatch) {
-    score += 50;
-    level++;
-    winSound.play();
-    pause = true;
-    showBanner("win");
-    setTimeout(chooseWord, 3000);
-  } else if (remainingGuesses <= 0) {
-    guessingWord = wordToMatch.split("");
-    loseSound.play();
-    pause = true;
-    showBanner("lose");
-    updateDisplay();
-    setTimeout(chooseWord, 3000);
-  }
-}
-
-function createKeyboard() {
-  const keyboard = document.getElementById("keyboard");
-  const letters = "abcdefghijklmnopqrstuvwxyz";
-  keyboard.innerHTML = "";
-
-  for (let char of letters) {
-    const btn = document.createElement("button");
-    btn.innerText = char;
-    btn.id = char;
-    btn.className = "key";
-    btn.onclick = () => handleGuess(char);
-    keyboard.appendChild(btn);
-  }
-}
-
-function resetKeyboard() {
-  const letters = "abcdefghijklmnopqrstuvwxyz";
-  for (let char of letters) {
-    const btn = document.getElementById(char);
-    if (btn) {
-      btn.disabled = false;
-      btn.innerText = char;
-    }
-  }
+function pickNewWord() {
+  const levelWords = getWordsForLevel(level);
+  if (levelWords.length === 0) return null;
+  return levelWords[Math.floor(Math.random() * levelWords.length)].toUpperCase();
 }
 
 function startGame() {
-  level = 1;
-  score = 0;
-  createKeyboard();
-  chooseWord();
+  guessedLetters = [];
+  displayWord = [];
+  guessesLeft = 6;
+  welcomeMsg.classList.add("noBlink");
+  welcomeMsg.innerText = `Level ${level}`;
+
+  currentWord = pickNewWord();
+  if (!currentWord) {
+    showBanner("YOU WIN!");
+    return;
+  }
+  usedWords.push(currentWord);
+
+  for (let char of currentWord) {
+    displayWord.push(char === " " ? " " : "_");
+  }
+
+  updateDisplay();
+  generateKeyboard();
 }
 
-startGame();
+function updateDisplay() {
+  wordDisplay.innerText = displayWord.join("");
+  guessedDisplay.innerText = guessedLetters.join(" ");
+  guessesLeftDisplay.innerText = guessesLeft;
+  scoreDisplay.innerText = score;
+}
+
+function handleGuess(letter) {
+  if (guessedLetters.includes(letter) || displayWord.includes(letter)) return;
+
+  const buttons = [...document.querySelectorAll(".key-button")];
+  const keyBtn = buttons.find(btn => btn.dataset.key === letter);
+  let found = false;
+
+  for (let i = 0; i < currentWord.length; i++) {
+    if (currentWord[i] === letter.toUpperCase()) {
+      displayWord[i] = letter.toUpperCase();
+      found = true;
+    }
+  }
+
+  if (found) {
+    if (keyBtn) keyBtn.innerText = "∞";
+    if (!displayWord.includes("_")) {
+      score++;
+      level++;
+      updateDisplay();
+      setTimeout(() => startGame(), 2000);
+    }
+  } else {
+    guessedLetters.push(letter);
+    guessesLeft--;
+    if (keyBtn) keyBtn.innerText = "❌";
+
+    if (guessesLeft === 0) {
+      showBanner("GAME OVER");
+      setTimeout(() => location.reload(), 3000);
+    }
+  }
+  updateDisplay();
+}
+
+function generateKeyboard() {
+  keyboardContainer.innerHTML = "";
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  letters.split("").forEach(letter => {
+    const button = document.createElement("button");
+    button.className = "key-button btn btn-outline-primary m-1";
+    button.textContent = letter;
+    button.dataset.key = letter.toLowerCase();
+    button.addEventListener("click", () => handleGuess(letter.toLowerCase()));
+    keyboardContainer.appendChild(button);
+  });
+}
+
+function showBanner(message) {
+  welcomeMsg.innerText = message;
+  welcomeMsg.classList.remove("noBlink");
+  welcomeMsg.classList.add("blink");
+  document.getElementById("keyboardContainer").innerHTML = "";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  startGame();
+  gameStarted = true;
+
+  document.addEventListener("keyup", (event) => {
+    const letter = event.key.toLowerCase();
+    if (/^[a-z]$/.test(letter)) {
+      handleGuess(letter);
+    }
+  });
+});
