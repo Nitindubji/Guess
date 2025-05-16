@@ -58,11 +58,11 @@ function startGame() {
 }
 
 function updateDisplay() {
-  wordDisplay.innerText = displayWord.join(" ");
+  wordDisplay.innerText = displayWord.join("");
   guessedDisplay.innerText = guessedLetters.join(" ");
   guessesLeftDisplay.innerText = guessesLeft;
   scoreDisplay.innerText = score;
-  levelDisplay.innerText = level;
+  document.getElementById("level").innerText = level; // <-- This is the fix
 }
 
 function handleGuess(letter) {
