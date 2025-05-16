@@ -76,19 +76,24 @@ var championSound = new Audio("./assets/sounds/crazysob.mp3");
 //Starts game
 function initializeGame() {
   function createOnScreenKeyboard() {
-    const keyboardContainer = document.getElementById('keyboardContainer');
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const keyboardContainer = document.getElementById('keyboardContainer');
+  keyboardContainer.innerHTML = ""; // Clear old buttons if any
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    letters.split('').forEach(letter => {
-        const button = document.createElement('button');
-        button.textContent = letter;
-        button.addEventListener('click', () => {
-            handleGuess(letter.toLowerCase()); // Use your existing guess logic
-        });
-        keyboardContainer.appendChild(button);
+  letters.split('').forEach(letter => {
+    const button = document.createElement('button');
+    button.textContent = letter;
+    button.classList.add('btn', 'btn-primary', 'm-1'); // Bootstrap styling
+    button.addEventListener('click', () => {
+      document.getElementById('welcome').className = 'noBlink';
+
+      if (!pause && isLetter(letter)) {
+        checkForLetter(letter.toUpperCase());
+      }
     });
-}
-
+    keyboardContainer.appendChild(button);
+  });
+  }
 // Call this on page load
 window.onload = function () {
     createOnScreenKeyboard();
