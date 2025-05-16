@@ -13,16 +13,15 @@ let displayWord = [];
 let guessesLeft = 6;
 let score = 0;
 let level = 1;
-let gameStarted = false;
 let usedWords = [];
 
 const wordDisplay = document.getElementById("currentWord");
 const guessedDisplay = document.getElementById("guessedLetters");
 const guessesLeftDisplay = document.getElementById("remainingGuesses");
 const scoreDisplay = document.getElementById("totalWins");
-const levelDisplay = document.getElementById("level");
 const welcomeMsg = document.getElementById("welcome");
 const keyboardContainer = document.getElementById("keyboardContainer");
+const levelDisplay = document.getElementById("level");
 
 function getWordsForLevel(level) {
   const wordLength = 4 + level;
@@ -40,6 +39,7 @@ function startGame() {
   displayWord = [];
   guessesLeft = 6;
   welcomeMsg.classList.add("noBlink");
+  welcomeMsg.classList.remove("blink");
   welcomeMsg.innerText = `Level ${level}`;
 
   currentWord = pickNewWord();
@@ -58,30 +58,28 @@ function startGame() {
 }
 
 function updateDisplay() {
-  wordDisplay.innerText = displayWord.join("");
+  wordDisplay.innerText = displayWord.join(" ");
   guessedDisplay.innerText = guessedLetters.join(" ");
   guessesLeftDisplay.innerText = guessesLeft;
   scoreDisplay.innerText = score;
-  document.getElementById("level").innerText = level; // <-- This is the fix
+  levelDisplay.innerText = level;
 }
 
 function handleGuess(letter) {
-  letter = letter.toUpperCase();
-  if (guessedLetters.includes(letter) || displayWord.includes(letter)) return;
+  if (guessedLetters.includes(letter) || displayWord.includes(letter.toUpperCase())) return;
 
-  const buttons = [...document.querySelectorAll(".key-button")];
-  const keyBtn = buttons.find(btn => btn.dataset.key.toUpperCase() === letter);
+  const keyBtn = document.querySelector(`.key-button[data-key="${letter}"]`);
   let found = false;
 
   for (let i = 0; i < currentWord.length; i++) {
-    if (currentWord[i] === letter) {
-      displayWord[i] = letter;
+    if (currentWord[i] === letter.toUpperCase()) {
+      displayWord[i] = letter.toUpperCase();
       found = true;
     }
   }
 
   if (found) {
-    if (keyBtn) keyBtn.innerText = "∞"; // infinity symbol
+    if (keyBtn) keyBtn.textContent = "∞";
     if (!displayWord.includes("_")) {
       score++;
       level++;
@@ -91,13 +89,13 @@ function handleGuess(letter) {
   } else {
     guessedLetters.push(letter);
     guessesLeft--;
-    if (keyBtn) keyBtn.innerText = "✘"; // cross symbol
-
+    if (keyBtn) keyBtn.textContent = "✖";
     if (guessesLeft === 0) {
       showBanner("GAME OVER");
       setTimeout(() => location.reload(), 3000);
     }
   }
+
   updateDisplay();
 }
 
@@ -109,7 +107,7 @@ function generateKeyboard() {
     button.className = "key-button btn btn-outline-primary m-1";
     button.textContent = letter;
     button.dataset.key = letter.toLowerCase();
-    button.addEventListener("click", () => handleGuess(letter));
+    button.addEventListener("click", () => handleGuess(letter.toLowerCase()));
     keyboardContainer.appendChild(button);
   });
 }
@@ -123,11 +121,10 @@ function showBanner(message) {
 
 document.addEventListener("DOMContentLoaded", () => {
   startGame();
-  gameStarted = true;
 
   document.addEventListener("keyup", (event) => {
-    const letter = event.key.toUpperCase();
-    if (/^[A-Z]$/.test(letter)) {
+    const letter = event.key.toLowerCase();
+    if (/^[a-z]$/.test(letter)) {
       handleGuess(letter);
     }
   });
