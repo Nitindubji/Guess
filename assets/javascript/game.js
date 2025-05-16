@@ -23,10 +23,9 @@ function startGame() {
   displayWord = Array.from(currentWord).map(char => (char === " " ? " " : "_"));
   updateDisplay();
   generateKeyboard();
-  welcomeMsg.textContent = ""; // No “Press Any Key” message
+  welcomeMsg.textContent = "Game Started! Guess the word.";
   welcomeMsg.classList.remove("blink");
 }
-
 function updateDisplay() {
   wordDisplay.textContent = displayWord.join(" ");
   guessedDisplay.textContent = guessedLetters.join(" ");
