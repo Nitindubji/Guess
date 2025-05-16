@@ -1,252 +1,124 @@
-var possibleWords = [
-  "GRAND CANYON", 
-  "ROCKY MOUNTAIN", 
-  "ZION", 
-  // "YELLOWSTONE",
-  // "YOSEMITE", 
-  // "GRAND TETON", 
-  // "GLACIER", 
-  // "ACADIA", 
-  // "MAMMOTH CAVE", 
-  // "OLYMPIC", 
-  // "GREAT SMOKY MOUNTAINS",
-  // "ARCHES",
-  // "BRYCE CANYON",
-  // "CARLSBAD CAVERNS",
-  // "CRATER LAKE",
-  // "DEATH VALLEY",
-  // "DENALI",
-  // "JOSHUA TREE",
-  // "CAPITOL REEF",
-  // "CANYON LANDS",
-  // "BADLANDS",
-  // "BIG BEND",
-  // "SEQUOIA",
-  // "BISCAYNE",
-  // "SHENANDOAH",
-  // "HOT SPRINGS",
-  // "MOUNT RANIER",
-  // "SAGUARO",
-  // "KINGS CANYON",
-  // "EVERGLADES",
-  // "MESA VERDE",
-  // "REDWOOD",
-  // "CHANNEL ISLANDS",
-  // "BLACK CANYON OF THE GUNNISON",
-  // "CONGAREE",
-  // "CUYAHOGA VALLEY",
-  // "DRY TORTUGAS",
-  // "GATEWAY ARCH",
-  // "GATES OF THE ARCTIC",
-  // "AMERICAN SAMOA",
-  // "GLACIER BAY",
-  // "GREAT BASIN",
-  // "GUADALUPE MOUNTAINS",
-  // "HAWAII VOLCANOES",
-  // "HOT SPRINGS",
-  // "INDIANA DUNES",
-  // "KATMAI",
-  // "KENAI FJORDS",
-  // "LASSEN VOLCANIC",
-  // "NORTH CASCADES",
-  // "PETRIFIED FOREST",
-  // "PINNACLES",
-  // "THEODORE ROOSEVELT",
-  // "VIRGIN ISLANDS",
-  // "VOYAGEURS",
-  // "WRANGELL ST ELIAS",
-  // "WIND CAVE",
-  // "KOBUK VALLEY",
-  // "LAKE CLARK",
-  // "ISLE ROYALE",
-  // "HALEAKALA"
+// Your script.js file with full game logic, keyboard, scoring, banners, and difficulty level
+
+let wordList = [
+  "apple", "zebra", "lucky", "hello", "chair", "piano",
+  "planet", "mystery", "journey", "holiday",
+  "fantastic", "mountains", "adventure", "difficult",
+  "imagination", "architecture", "congratulation", "hindunberger"
 ];
 
-var guessedLetters = [];
-var guessingWord = [];
-var usedGuessingwWords = [];
-var wordToMatch;
-var numGuess;
-var wins = 0;
-var pause = false; // This var and setTimout function to not listen for keypress while game resets
-var loseSound = new Audio("./assets/sounds/ahahah.mp3");
-var winSound = new Audio("./assets/sounds/clever.wav");
-var championSound = new Audio("./assets/sounds/crazysob.mp3");
+let wordToMatch = "";
+let guessingWord = [];
+let guessedLetters = [];
+let remainingGuesses = 6;
+let score = 0;
+let level = 1;
+let maxLevel = 20;
+let pause = false;
 
-//Starts game
-function initializeGame() {
-  function createOnScreenKeyboard() {
-  const keyboardContainer = document.getElementById('keyboardContainer');
-  keyboardContainer.innerHTML = ""; // Clear old buttons if any
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const winSound = new Audio("assets/audio/smb3_powerup.wav");
+const loseSound = new Audio("assets/audio/smb3_mariodie.wav");
 
-  letters.split('').forEach(letter => {
-    const button = document.createElement('button');
-    button.textContent = letter;
-    button.classList.add('btn', 'btn-primary', 'm-1'); // Bootstrap styling
-    button.addEventListener('click', () => {
-      document.getElementById('welcome').className = 'noBlink';
-
-      if (!pause && isLetter(letter)) {
-        checkForLetter(letter.toUpperCase());
-      }
-    });
-    keyboardContainer.appendChild(button);
-  });
-  }
-// Call this on page load
-window.onload = function () {
-    createOnScreenKeyboard();
-    startGame(); // Your existing start function
-};
-
-  // Get a new word
-  wordToMatch = possibleWords[Math.floor(Math.random() * possibleWords.length)].toUpperCase();
-  // Set number of guesses (higher or lower) based on word length
-  if (wordToMatch.length <= 4) {
-    numGuess = 4
-  } else if (wordToMatch.length >4 && wordToMatch.length <= 7) {
-    numGuess = Math.floor(wordToMatch.length * .67)
-  } else if (wordToMatch.length >7 && wordToMatch.length <= 10) {
-    numGuess = Math.floor(wordToMatch.length * .5)
-  } else if (wordToMatch.length >10 && wordToMatch.length <= 14) {
-    numGuess = Math.floor(wordToMatch.length * .52)
-  } else if (wordToMatch.length >14) {
-    numGuess = 7;
-  }
-
-  // Get underscores for guessingWord from wordToMatch
-  for (var i=0; i < wordToMatch.length; i++){
-    // Put a space instead of an underscore between multi-word options in possibleWords array
-    if (wordToMatch[i] === " ") {
-      guessingWord.push(" ")
-    } 
-    else {
-      guessingWord.push("_");
-    }
-  }
+function chooseWord() {
+  const levelLength = Math.min(4 + level, 12); // start from 5-letter words
+  const filteredWords = wordList.filter(word => word.length === levelLength);
+  wordToMatch = filteredWords[Math.floor(Math.random() * filteredWords.length)];
+  guessingWord = Array(wordToMatch.length).fill("_");
+  guessedLetters = [];
+  remainingGuesses = 6;
   updateDisplay();
-};
+  resetKeyboard();
+  pause = false;
+}
 
-//Reset the game
-function resetGame() {
-  if (usedGuessingwWords.length === possibleWords.length) {
-    championSound.play() // Toggle line comment on for almost the entire possibleWords array to hear this end of game sound clip
-    usedGuessingwWords = []
-    wins = 0
-    setTimeout(resetGame, 6000); // Note for future change - shorten possibleWords, make jumbotron display congratulatory message upon guessing all possibilites
+function updateDisplay() {
+  document.getElementById("wordSpotlight").innerText = guessingWord.join(" ");
+  document.getElementById("guessesRemaining").innerText = `Guesses Remaining: ${remainingGuesses}`;
+  document.getElementById("guessedLetters").innerText = `Guessed Letters: ${guessedLetters.join(", ")}`;
+  document.getElementById("score").innerText = `Score: ${score}`;
+  document.getElementById("level").innerText = `Level: ${level}`;
+}
+
+function showBanner(type) {
+  const winBanner = document.getElementById("winBanner");
+  const loseBanner = document.getElementById("loseBanner");
+
+  if (type === "win") {
+    winBanner.style.display = "block";
+    setTimeout(() => { winBanner.style.display = "none"; }, 2500);
+  } else if (type === "lose") {
+    loseBanner.style.display = "block";
+    setTimeout(() => { loseBanner.style.display = "none"; }, 2500);
   }
-  else {
-    pause = false;
-    // Restores blinking "...get started" message
-    document.getElementById('welcome').className = 'blink';
-    
-    // Get a new word
-    wordToMatch = possibleWords[Math.floor(Math.random() * possibleWords.length)].toUpperCase();
-    console.log(wordToMatch)
-    // If new word has already been used randomly select another
-    if (usedGuessingwWords.includes(wordToMatch) === true) {
-      resetGame();
-    }
-    
-    // Set number of guesses (higher or lower) based on word length
-    if (wordToMatch.length <= 4) {
-      numGuess = 4
-    } else if (wordToMatch.length >4 && wordToMatch.length <= 7) {
-      numGuess = Math.floor(wordToMatch.length * .67)
-    } else if (wordToMatch.length >7 && wordToMatch.length <= 10) {
-      numGuess = Math.floor(wordToMatch.length * .5)
-    } else if (wordToMatch.length >10 && wordToMatch.length <= 14) {
-      numGuess = Math.floor(wordToMatch.length * .52)
-    } else if (wordToMatch.length >14) {
-      numGuess = 7;
-    }
+}
 
-    // Reset word arrays
-    guessedLetters = [];
-    guessingWord = [];
+function handleGuess(letter) {
+  if (pause || guessedLetters.includes(letter)) return;
+  guessedLetters.push(letter);
+  document.getElementById(letter).disabled = true;
 
-    // Reset the guessed word
-    for (var i=0; i < wordToMatch.length; i++){
-      // Put a space instead of an underscore between multi-word options in possibleWords array
-      if (wordToMatch[i] === " ") {
-        guessingWord.push(" ")
-      } 
-      else {
-        guessingWord.push("_");
+  if (wordToMatch.includes(letter)) {
+    for (let i = 0; i < wordToMatch.length; i++) {
+      if (wordToMatch[i] === letter) {
+        guessingWord[i] = letter;
       }
     }
+    document.getElementById(letter).innerText = "8"; // Correct guess mark
+  } else {
+    remainingGuesses--;
+    document.getElementById(letter).innerText = "X"; // Wrong guess mark
+  }
+
+  updateDisplay();
+
+  if (guessingWord.join("") === wordToMatch) {
+    score += 50;
+    level++;
+    winSound.play();
+    pause = true;
+    showBanner("win");
+    setTimeout(chooseWord, 3000);
+  } else if (remainingGuesses <= 0) {
+    guessingWord = wordToMatch.split("");
+    loseSound.play();
+    pause = true;
+    showBanner("lose");
     updateDisplay();
+    setTimeout(chooseWord, 3000);
   }
-};
+}
 
-// Update the Display
-function updateDisplay () {
-  document.getElementById("totalWins").innerText = wins;
-  document.getElementById("currentWord").innerText = guessingWord.join("");
-  document.getElementById("remainingGuesses").innerText = numGuess;
-  document.getElementById("guessedLetters").innerText =  guessedLetters.join(" ");
-};
+function createKeyboard() {
+  const keyboard = document.getElementById("keyboard");
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  keyboard.innerHTML = "";
 
-// Wait for key press
-document.onkeydown = function(event) {
-  // Make sure key pressed is an alpha character
-  if (isLetter(event.key) && pause === false) {
-  checkForLetter(event.key.toUpperCase());
+  for (let char of letters) {
+    const btn = document.createElement("button");
+    btn.innerText = char;
+    btn.id = char;
+    btn.className = "key";
+    btn.onclick = () => handleGuess(char);
+    keyboard.appendChild(btn);
   }
-  // Turn off blinking "...get started" message on keypress
-  document.getElementById('welcome').className = 'noBlink';
-};
+}
 
-// Check if key pressed is between A-Z or a-z
-var isLetter = function(ch){
-  return typeof ch === "string" && ch.length === 1
-  && (ch >= "a" && ch <= "z" || ch >= "A" && ch <= "Z");
-};
-
-// Check if letter is in word
-function checkForLetter(letter) {
-  var foundLetter = false;
-
-  // Search string for letter
-  for (var i=0; i < wordToMatch.length; i++) {
-    if (letter === wordToMatch[i]) {
-      guessingWord[i] = letter
-      foundLetter = true
-      // If guessing word matches random word
-      if (guessingWord.join("") === wordToMatch) {
-        // Increment # of wins and add word to usedGuessingWords
-        wins++
-        // Add word to usedGuessingWords array to not be repeated
-        usedGuessingwWords.push(wordToMatch)
-        console.log(usedGuessingwWords)
-        pause = true;
-        winSound.play();
-        updateDisplay();
-        setTimeout(resetGame, 4000);
-      }
+function resetKeyboard() {
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  for (let char of letters) {
+    const btn = document.getElementById(char);
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = char;
     }
   }
-  if (foundLetter === false) {
-    // Check if inccorrect guess is already on the list
-    if (guessedLetters.includes(letter) === false) {
-      // Add incorrect letter to guessed letter list
-      guessedLetters.push(letter)
-      // Decrement the number of remaining guesses
-      numGuess--
-    }
-    if (numGuess === 0) {
-      // Add word to usedGuessingWords array to not be repeated
-      usedGuessingwWords.push(wordToMatch);
-      console.log(usedGuessingwWords)
-      // Display word before reseting game
-      guessingWord = wordToMatch.split();
-      pause = true;
-      loseSound.play();
-      setTimeout(resetGame, 4000);
-    }
-  }
-  updateDisplay();
-};
+}
 
-initializeGame();
+function startGame() {
+  level = 1;
+  score = 0;
+  createKeyboard();
+  chooseWord();
+}
+
+startGame();
