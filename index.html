@@ -1,65 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <style>
-  .key-button {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .blink {
-    animation: blinker 1s linear infinite;
-  }
-
-  .noBlink {
-    animation: none;
-  }
-
-  @keyframes blinker {
-    50% {
-      opacity: 0;
-    }
-  }
-  </style>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+  <title>Word Guessing Game - National Parks Edition</title>
   <link rel="stylesheet" href="assets/css/reset.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
-  <link
-    rel="stylesheet"
-    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-    crossorigin="anonymous"
-  />
-  <link
-    href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c&display=swap"
-    rel="stylesheet"
-  />
-  <title>Word Guessing Game - National Parks Edition</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c&display=swap" rel="stylesheet" />
   <style>
-    .key-button {
-      margin: 2px;
-      width: 35px;
-      height: 35px;
-      font-size: 1.1rem;
+    .keyboard-button {
+      margin: 3px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      transition: background-color 0.2s ease-in-out;
+      background-color: #f8f9fa;
+      cursor: pointer;
     }
 
-    .correct-key {
+    .correct {
       background-color: #d4edda;
       color: green;
     }
 
-    .wrong-key {
+    .incorrect {
       background-color: #f8d7da;
       color: red;
     }
 
-    #bannerContainer {
-      margin-top: 20px;
+    .banner {
+      display: none;
+      font-size: 24px;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .win-banner {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .lose-banner {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .blink {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -71,7 +68,7 @@
         <div class="col-lg-12 pt-4">
           <div class="text-center">
             <h1>Word Guessing Game</h1>
-            <h2>-National Parks Edition-</h2>
+            <h2>- National Parks Edition -</h2>
           </div>
         </div>
       </div>
@@ -79,26 +76,18 @@
 
       <div class="row">
         <div class="col-lg-12 text-center pb-3">
-          <p><h4 id="welcome" class="blink">Press Any Key To Get Started!</h4></p>
-          <br />
-          <div><h5>Word: <span id="currentWord"></span></h5></div>
-          <br />
-          <div><h6>Wins: <span id="totalWins" class="varColor">0</span></h6></div>
-          <div><h6>Guesses Left: <span id="remainingGuesses" class="varColor">0</span></h6></div>
-          <div><h6>Already Guessed: <span id="guessedLetters" class="varColor"></span></h6></div>
-          <div><h6>Score: <span id="score" class="varColor">0</span></h6></div>
-          <div><h6>Level: <span id="level" class="varColor">1</span></h6></div>
-          
-          <!-- On-Screen Keyboard -->
-          <div id="onScreenKeyboard" class="text-center mt-4">
-            <div id="keyboardContainer"></div>
-          </div>
+          <h4 id="welcome" class="blink">Press Any Key or Click Letters To Start!</h4>
+          <div id="winBanner" class="banner win-banner">You Win!</div>
+          <div id="loseBanner" class="banner lose-banner">Game Over!</div>
 
-          <!-- Banners -->
-          <div id="bannerContainer" class="text-center mt-4">
-            <div id="winBanner" style="display: none; font-size: 1.5rem; color: green; font-weight: bold;">You Win This Round!</div>
-            <div id="gameOverBanner" style="display: none; font-size: 1.5rem; color: red; font-weight: bold;">Game Over!</div>
-          </div>
+          <div class="mt-3"><h5>Word: <span id="currentWord"></span></h5></div>
+          <div><h6>Wins: <span id="totalWins" class="varColor"></span></h6></div>
+          <div><h6>Level: <span id="gameLevel" class="varColor">1</span></h6></div>
+          <div><h6>Guesses Left: <span id="remainingGuesses" class="varColor"></span></h6></div>
+          <div><h6>Already Guessed: <span id="guessedLetters" class="varColor"></span></h6></div>
+
+          <!-- On-Screen Keyboard -->
+          <div id="keyboardContainer" class="text-center mt-4"></div>
         </div>
       </div>
     </div>
