@@ -78,7 +78,7 @@ function handleGuess(letter) {
   }
 
   if (found) {
-    if (keyBtn) keyBtn.innerText = "∞";
+    if (keyBtn) keyBtn.innerText = "âˆž";
     if (!displayWord.includes("_")) {
       score++;
       level++;
@@ -88,7 +88,7 @@ function handleGuess(letter) {
   } else {
     guessedLetters.push(letter);
     guessesLeft--;
-    if (keyBtn) keyBtn.innerText = "❌";
+    if (keyBtn) keyBtn.innerText = "âŒ";
 
     if (guessesLeft === 0) {
       showBanner("GAME OVER");
