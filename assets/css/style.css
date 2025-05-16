@@ -8,20 +8,18 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center 0;
-    
 }
 
 .container {
-
     font-family: 'M PLUS Rounded 1c', sans-serif;
     font-size: 30px;
     color: #f7db9a;
     letter-spacing: 0.5px;
     text-shadow:
-    -1px -1px 0 #120d01,
-    1px -1px 0 #120d01,
-    -1px 1px 0 #120d01,
-    1px 1px 0 #120d01;
+        -1px -1px 0 #120d01,
+        1px -1px 0 #120d01,
+        -1px 1px 0 #120d01,
+        1px 1px 0 #120d01;
 }
 
 .jumbotron {
@@ -77,6 +75,13 @@ h6 {
     50%{opacity: .5;}
     100%{opacity: 1;}   
 }
+
+#keyboardContainer {
+    max-width: 400px;
+    margin: 20px auto;
+    text-align: center;
+}
+
 #keyboardContainer button {
     margin: 4px;
     width: 40px;
@@ -86,9 +91,18 @@ h6 {
     border: 1px solid #ccc;
     background-color: #f8f9fa;
     cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-#keyboardContainer {
-    max-width: 400px;
-    margin: auto;
+.key-button.correct {
+    background-color: #c8e6c9; /* light green */
+    color: #2e7d32; /* dark green */
+    font-weight: bold;
+}
+
+.key-button.wrong {
+    background-color: #ffcdd2; /* light red */
+    color: #c62828; /* dark red */
+    font-weight: bold;
 }
