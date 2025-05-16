@@ -2,9 +2,9 @@ var possibleWords = [
   "GRAND CANYON", 
   "ROCKY MOUNTAIN", 
   "ZION", 
-  // "YELLOWSTONE",
-  // "YOSEMITE", 
-  // "GRAND TETON", 
+  "YELLOWSTONE",
+  "YOSEMITE", 
+  "GRAND TETON", 
   // "GLACIER", 
   // "ACADIA", 
   // "MAMMOTH CAVE", 
@@ -72,130 +72,134 @@ var pause = false; // This var and setTimout function to not listen for keypress
 var loseSound = new Audio("./assets/sounds/ahahah.mp3");
 var winSound = new Audio("./assets/sounds/clever.wav");
 var championSound = new Audio("./assets/sounds/crazysob.mp3");
+// ... your existing variables here ...
 
-//Starts game
+// Generate virtual keyboard buttons on the page
+function generateKeyboard() {
+  const keyboardContainer = document.getElementById('keyboard');
+  if (!keyboardContainer) return;
+
+  keyboardContainer.innerHTML = ''; // Clear old buttons
+
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for (let char of alphabet) {
+    const btn = document.createElement('button');
+    btn.textContent = char;
+    btn.classList.add('btn', 'btn-outline-primary', 'm-1');
+    btn.style.width = '40px';
+    btn.style.height = '40px';
+    btn.style.fontWeight = 'bold';
+
+    btn.addEventListener('click', () => {
+      if (!btn.disabled && pause === false) {
+        checkForLetter(char);
+        btn.disabled = true;
+        btn.classList.remove('btn-outline-primary');
+        btn.classList.add('btn-primary');
+      }
+    });
+
+    keyboardContainer.appendChild(btn);
+  }
+}
+
+// Modify initializeGame to generate keyboard after setting up word
 function initializeGame() {
-
-  // Get a new word
   wordToMatch = possibleWords[Math.floor(Math.random() * possibleWords.length)].toUpperCase();
-  // Set number of guesses (higher or lower) based on word length
+
   if (wordToMatch.length <= 4) {
-    numGuess = 4
-  } else if (wordToMatch.length >4 && wordToMatch.length <= 7) {
-    numGuess = Math.floor(wordToMatch.length * .67)
-  } else if (wordToMatch.length >7 && wordToMatch.length <= 10) {
-    numGuess = Math.floor(wordToMatch.length * .5)
-  } else if (wordToMatch.length >10 && wordToMatch.length <= 14) {
-    numGuess = Math.floor(wordToMatch.length * .52)
-  } else if (wordToMatch.length >14) {
+    numGuess = 4;
+  } else if (wordToMatch.length > 4 && wordToMatch.length <= 7) {
+    numGuess = Math.floor(wordToMatch.length * 0.67);
+  } else if (wordToMatch.length > 7 && wordToMatch.length <= 10) {
+    numGuess = Math.floor(wordToMatch.length * 0.5);
+  } else if (wordToMatch.length > 10 && wordToMatch.length <= 14) {
+    numGuess = Math.floor(wordToMatch.length * 0.52);
+  } else if (wordToMatch.length > 14) {
     numGuess = 7;
   }
 
-  // Get underscores for guessingWord from wordToMatch
-  for (var i=0; i < wordToMatch.length; i++){
-    // Put a space instead of an underscore between multi-word options in possibleWords array
-    if (wordToMatch[i] === " ") {
-      guessingWord.push(" ")
-    } 
-    else {
-      guessingWord.push("_");
-    }
+  guessingWord = [];
+  for (var i = 0; i < wordToMatch.length; i++) {
+    guessingWord.push(wordToMatch[i] === " " ? " " : "_");
   }
-  updateDisplay();
-};
 
-//Reset the game
+  generateKeyboard();  // <-- Add this line to generate keyboard buttons
+
+  updateDisplay();
+}
+
+// Modify resetGame to generate keyboard after resetting arrays
 function resetGame() {
   if (usedGuessingwWords.length === possibleWords.length) {
-    championSound.play() // Toggle line comment on for almost the entire possibleWords array to hear this end of game sound clip
-    usedGuessingwWords = []
-    wins = 0
-    setTimeout(resetGame, 6000); // Note for future change - shorten possibleWords, make jumbotron display congratulatory message upon guessing all possibilites
-  }
-  else {
+    championSound.play();
+    usedGuessingwWords = [];
+    wins = 0;
+    setTimeout(resetGame, 6000);
+  } else {
     pause = false;
-    // Restores blinking "...get started" message
     document.getElementById('welcome').className = 'blink';
-    
-    // Get a new word
+
     wordToMatch = possibleWords[Math.floor(Math.random() * possibleWords.length)].toUpperCase();
-    console.log(wordToMatch)
-    // If new word has already been used randomly select another
-    if (usedGuessingwWords.includes(wordToMatch) === true) {
+    if (usedGuessingwWords.includes(wordToMatch)) {
       resetGame();
+      return;
     }
-    
-    // Set number of guesses (higher or lower) based on word length
+
     if (wordToMatch.length <= 4) {
-      numGuess = 4
-    } else if (wordToMatch.length >4 && wordToMatch.length <= 7) {
-      numGuess = Math.floor(wordToMatch.length * .67)
-    } else if (wordToMatch.length >7 && wordToMatch.length <= 10) {
-      numGuess = Math.floor(wordToMatch.length * .5)
-    } else if (wordToMatch.length >10 && wordToMatch.length <= 14) {
-      numGuess = Math.floor(wordToMatch.length * .52)
-    } else if (wordToMatch.length >14) {
+      numGuess = 4;
+    } else if (wordToMatch.length > 4 && wordToMatch.length <= 7) {
+      numGuess = Math.floor(wordToMatch.length * 0.67);
+    } else if (wordToMatch.length > 7 && wordToMatch.length <= 10) {
+      numGuess = Math.floor(wordToMatch.length * 0.5);
+    } else if (wordToMatch.length > 10 && wordToMatch.length <= 14) {
+      numGuess = Math.floor(wordToMatch.length * 0.52);
+    } else if (wordToMatch.length > 14) {
       numGuess = 7;
     }
 
-    // Reset word arrays
     guessedLetters = [];
     guessingWord = [];
-
-    // Reset the guessed word
-    for (var i=0; i < wordToMatch.length; i++){
-      // Put a space instead of an underscore between multi-word options in possibleWords array
-      if (wordToMatch[i] === " ") {
-        guessingWord.push(" ")
-      } 
-      else {
-        guessingWord.push("_");
-      }
+    for (var i = 0; i < wordToMatch.length; i++) {
+      guessingWord.push(wordToMatch[i] === " " ? " " : "_");
     }
+
+    generateKeyboard();  // <-- Add this line to reset keyboard
+
     updateDisplay();
   }
-};
+}
 
-// Update the Display
-function updateDisplay () {
-  document.getElementById("totalWins").innerText = wins;
-  document.getElementById("currentWord").innerText = guessingWord.join("");
-  document.getElementById("remainingGuesses").innerText = numGuess;
-  document.getElementById("guessedLetters").innerText =  guessedLetters.join(" ");
-};
-
-// Wait for key press
+// Modify keydown event to disable virtual keys when typing physical keyboard letters
 document.onkeydown = function(event) {
-  // Make sure key pressed is an alpha character
   if (isLetter(event.key) && pause === false) {
-  checkForLetter(event.key.toUpperCase());
+    let letter = event.key.toUpperCase();
+    checkForLetter(letter);
+
+    // Disable matching button on virtual keyboard
+    const buttons = document.querySelectorAll('#keyboard button');
+    buttons.forEach(button => {
+      if (button.textContent === letter) {
+        button.disabled = true;
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-primary');
+      }
+    });
   }
-  // Turn off blinking "...get started" message on keypress
   document.getElementById('welcome').className = 'noBlink';
 };
 
-// Check if key pressed is between A-Z or a-z
-var isLetter = function(ch){
-  return typeof ch === "string" && ch.length === 1
-  && (ch >= "a" && ch <= "z" || ch >= "A" && ch <= "Z");
-};
-
-// Check if letter is in word
+// Modify checkForLetter to disable buttons after guessing (optional but better UX)
 function checkForLetter(letter) {
   var foundLetter = false;
 
-  // Search string for letter
-  for (var i=0; i < wordToMatch.length; i++) {
+  for (var i = 0; i < wordToMatch.length; i++) {
     if (letter === wordToMatch[i]) {
-      guessingWord[i] = letter
-      foundLetter = true
-      // If guessing word matches random word
+      guessingWord[i] = letter;
+      foundLetter = true;
       if (guessingWord.join("") === wordToMatch) {
-        // Increment # of wins and add word to usedGuessingWords
-        wins++
-        // Add word to usedGuessingWords array to not be repeated
-        usedGuessingwWords.push(wordToMatch)
-        console.log(usedGuessingwWords)
+        wins++;
+        usedGuessingwWords.push(wordToMatch);
         pause = true;
         winSound.play();
         updateDisplay();
@@ -203,26 +207,30 @@ function checkForLetter(letter) {
       }
     }
   }
-  if (foundLetter === false) {
-    // Check if inccorrect guess is already on the list
-    if (guessedLetters.includes(letter) === false) {
-      // Add incorrect letter to guessed letter list
-      guessedLetters.push(letter)
-      // Decrement the number of remaining guesses
-      numGuess--
+
+  if (!foundLetter) {
+    if (!guessedLetters.includes(letter)) {
+      guessedLetters.push(letter);
+      numGuess--;
     }
     if (numGuess === 0) {
-      // Add word to usedGuessingWords array to not be repeated
       usedGuessingwWords.push(wordToMatch);
-      console.log(usedGuessingwWords)
-      // Display word before reseting game
-      guessingWord = wordToMatch.split();
+      guessingWord = wordToMatch.split("");
       pause = true;
       loseSound.play();
       setTimeout(resetGame, 4000);
     }
   }
+
+  // Disable button for guessed letter on virtual keyboard
+  const buttons = document.querySelectorAll('#keyboard button');
+  buttons.forEach(button => {
+    if (button.textContent === letter) {
+      button.disabled = true;
+      button.classList.remove('btn-outline-primary');
+      button.classList.add('btn-primary');
+    }
+  });
+
   updateDisplay();
 };
-
-initializeGame();
