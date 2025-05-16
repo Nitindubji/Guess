@@ -20,6 +20,7 @@ const wordDisplay = document.getElementById("currentWord");
 const guessedDisplay = document.getElementById("guessedLetters");
 const guessesLeftDisplay = document.getElementById("remainingGuesses");
 const scoreDisplay = document.getElementById("totalWins");
+const levelDisplay = document.getElementById("level");
 const welcomeMsg = document.getElementById("welcome");
 const keyboardContainer = document.getElementById("keyboardContainer");
 
@@ -57,28 +58,30 @@ function startGame() {
 }
 
 function updateDisplay() {
-  wordDisplay.innerText = displayWord.join("");
+  wordDisplay.innerText = displayWord.join(" ");
   guessedDisplay.innerText = guessedLetters.join(" ");
   guessesLeftDisplay.innerText = guessesLeft;
   scoreDisplay.innerText = score;
+  levelDisplay.innerText = level;
 }
 
 function handleGuess(letter) {
+  letter = letter.toUpperCase();
   if (guessedLetters.includes(letter) || displayWord.includes(letter)) return;
 
   const buttons = [...document.querySelectorAll(".key-button")];
-  const keyBtn = buttons.find(btn => btn.dataset.key === letter);
+  const keyBtn = buttons.find(btn => btn.dataset.key.toUpperCase() === letter);
   let found = false;
 
   for (let i = 0; i < currentWord.length; i++) {
-    if (currentWord[i] === letter.toUpperCase()) {
-      displayWord[i] = letter.toUpperCase();
+    if (currentWord[i] === letter) {
+      displayWord[i] = letter;
       found = true;
     }
   }
 
   if (found) {
-    if (keyBtn) keyBtn.innerText = "âˆž";
+    if (keyBtn) keyBtn.innerText = "∞"; // infinity symbol
     if (!displayWord.includes("_")) {
       score++;
       level++;
@@ -88,7 +91,7 @@ function handleGuess(letter) {
   } else {
     guessedLetters.push(letter);
     guessesLeft--;
-    if (keyBtn) keyBtn.innerText = "âŒ";
+    if (keyBtn) keyBtn.innerText = "✘"; // cross symbol
 
     if (guessesLeft === 0) {
       showBanner("GAME OVER");
@@ -106,7 +109,7 @@ function generateKeyboard() {
     button.className = "key-button btn btn-outline-primary m-1";
     button.textContent = letter;
     button.dataset.key = letter.toLowerCase();
-    button.addEventListener("click", () => handleGuess(letter.toLowerCase()));
+    button.addEventListener("click", () => handleGuess(letter));
     keyboardContainer.appendChild(button);
   });
 }
@@ -115,7 +118,7 @@ function showBanner(message) {
   welcomeMsg.innerText = message;
   welcomeMsg.classList.remove("noBlink");
   welcomeMsg.classList.add("blink");
-  document.getElementById("keyboardContainer").innerHTML = "";
+  keyboardContainer.innerHTML = "";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -123,8 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
   gameStarted = true;
 
   document.addEventListener("keyup", (event) => {
-    const letter = event.key.toLowerCase();
-    if (/^[a-z]$/.test(letter)) {
+    const letter = event.key.toUpperCase();
+    if (/^[A-Z]$/.test(letter)) {
       handleGuess(letter);
     }
   });
