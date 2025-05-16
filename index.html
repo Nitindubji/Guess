@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <style>
+  .key-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .blink {
+    animation: blinker 1s linear infinite;
+  }
+
+  .noBlink {
+    animation: none;
+  }
+
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+  </style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
